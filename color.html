@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,minimal-ui">
+  <meta name=format-detection content="telephone=no">
+
+  <title>Jerrylin's tools</title>
+  <link rel=icon href=/favicon.ico type=image/x-icon>
+  <link rel="shortcut icon" href=/favicon.ico type=image/x-icon>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.bootcss.com/twitter-bootstrap/4.4.1/css/bootstrap.css" rel="stylesheet">
+  <style>
+  .m-panel {
+    float: left;
+    width: 400px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+  }
+  .m-panel .input-group {
+    margin-bottom: 5px;
+  }
+  .m-panel .preview {
+    width: 50px;
+    height: 50px;
+  }
+  .m-panel .btn {
+    margin-right: 10px;
+  }
+  </style>
+</head>
+<body>
+  <div class="g-doc">
+    <!-- RGB 转 HEX -->
+    <div class="m-panel m-rgb2hex" id="rgb2hex">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">R</span>
+        </div>
+        <input type="text" class="form-control form-control-r" aria-label="R">
+      </div>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">G</span>
+        </div>
+        <input type="text" class="form-control form-control-g" aria-label="G">
+      </div>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">B</span>
+        </div>
+        <input type="text" class="form-control form-control-b" aria-label="B">
+      </div>
+      <div class="input-group">
+        <button type="button" class="btn btn-primary btn-convert" onclick="convert2hex()">转换</button>
+        <button type="button" class="btn btn-default btn-convert" onclick="reset('rgb2hex')">重置</button>
+      </div>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">#</span>
+        </div>
+        <input type="text" class="form-control form-control-x" aria-label="result">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" onclick="toLowerCase()">小写</button>
+        </div>
+      </div>
+      <div class="preview"></div>
+    </div>
+
+    <!-- HEX 转 RGB -->
+    <div class="m-panel m-rgb2hex" id="hex2rgb">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">#</span>
+        </div>
+        <input type="text" class="form-control form-control-x" aria-label="result">
+      </div>
+      <div class="input-group">
+        <button type="button" class="btn btn-primary btn-convert" onclick="convert2rgb()">转换</button>
+        <button type="button" class="btn btn-default btn-convert" onclick="reset('hex2rgb')">重置</button>
+      </div>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">R</span>
+        </div>
+        <input type="text" class="form-control form-control-r" aria-label="R">
+      </div>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">G</span>
+        </div>
+        <input type="text" class="form-control form-control-g" aria-label="G">
+      </div>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">B</span>
+        </div>
+        <input type="text" class="form-control form-control-b" aria-label="B">
+      </div>
+      <div class="preview"></div>
+    </div>
+  </div>
+  <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+  <script src="https://cdn.bootcss.com/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  <script>
+  function reset(id) {
+    var $inputs = $('#' + id + ' .form-control');
+    $inputs.each(function r(index, item) {
+      $(item).val('');
+    });
+    $('#' + id + ' .preview').css({backgroundColor: '#fff'});
+  }
+  function toLowerCase() {
+    var $input = $('#rgb2hex .form-control').eq(3);
+    var val = $input.val().toLowerCase();
+    $input.val(val);
+  }
+  function convert2hex() {
+    var $inputs = $('#rgb2hex .form-control');
+    var $result = $('#rgb2hex .result');
+    var hexStr = '';
+    for (i = 0; i < 3; i += 1) {
+      var n = $inputs.eq(i).val();
+      if (n === '') {
+        n = '0';
+      }
+      if (parseInt(n) != n) {
+        return alert('请输入数字！');
+      }
+      if (n > 255 || n < 0) {
+        return alert('数字在0-255之间！');
+      }
+      var c = '0123456789ABCDEF';
+      var b = '';
+      var a = n % 16;
+      b = c.substr(a, 1);
+      a = (n - a) / 16;
+      hexStr += c.substr(a, 1) + b;
+    }
+    $inputs.eq(3).val(hexStr);
+    $('#rgb2hex .preview').css({backgroundColor: '#' + hexStr});
+  }
+  function convert2rgb() {
+    var $inputs = $('#hex2rgb .form-control');
+    var $result = $('#hex2rgb .result');
+    var a = $inputs.eq(0).val();
+    if (a.charAt(0) === '#') {
+      a = a.substr(1);
+    }
+    var len = a.length;
+    if (len != 6 && len != 3) {
+      return alert('十六进制颜色码为六位或三位！');
+    } else if (/[^0-9a-f]/i.test(a)) {
+      return alert('请输入正确的十六进制颜色码！');
+    }
+    $('#hex2rgb .preview').css({backgroundColor: '#' + a});
+
+    a = a.toLowerCase();
+    var b = new Array();
+    for (i = 0; i < 3; i += 1) {
+      b[0] = len === 6 ? a.substr(i * 2, 2) : a.substr(i * 1, 1) + a.substr(i * 1, 1);
+      b[3] = '0123456789abcdef';
+      b[1] = b[0].substr(0, 1);
+      b[2] = b[0].substr(1, 1);
+      b[20 + i] = b[3].indexOf(b[1]) * 16 + b[3].indexOf(b[2]);
+    }
+    $inputs.eq(1).val(b[20]);
+    $inputs.eq(2).val(b[21]);
+    $inputs.eq(3).val(b[22]);
+  }
+  </script>
+</body>
+</html>
